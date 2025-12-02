@@ -205,7 +205,7 @@ void loop() {
 
   if (1) {
     //char commandCharacter = Serial.read();  //we use characters (letters) for controlling the switch-case
-    char commandCharacter='D';
+    char commandCharacter='C';
     switch (commandCharacter)  //based on the command character, we decide what to do
     {
       case 's':  //SDATAC - Stop Reading Data Continously
@@ -249,9 +249,9 @@ void loop() {
       case 'D':                       //Cycle differential inputs (A0+A1, A2+A3, A4+A5, A6+A7)
         while (1)  //The conversion is stopped by a character received from the serial port
         {
-          float channels[4];  //Buffer that holds 4 conversions (4 differential channels)
+          float channels[8];  //Buffer that holds 4 conversions (4 differential channels)
           for (int j = 0; j < 8; j++) {
-            channels[j] = A.convertToVoltage(A.cycleDifferential());  //store the converted differential results in the buffer
+            channels[j] = A.convertToVoltage(A.cycleSingle());  //store the converted differential results in the buffer
           }
 
           //After the 4 conversions are in the buffer, the contents are printed on the serial terminal
