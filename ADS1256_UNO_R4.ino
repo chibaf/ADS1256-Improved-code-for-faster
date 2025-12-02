@@ -203,36 +203,36 @@ void loop() {
   */
 
 
-  if (1) {
-    //char commandCharacter = Serial.read();  //we use characters (letters) for controlling the switch-case
-    char commandCharacter='C';
-    switch (commandCharacter)  //based on the command character, we decide what to do
-    {
-      case 's':  //SDATAC - Stop Reading Data Continously
-        A.stopConversion();
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'L':  //Perform a self calibration
-        A.sendDirectCommand(SELFCAL);
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'G':                       //Read a single input continuously
-        while (Serial.read() != 's')  //The conversion is stopped by a character received from the serial port
-        {
-          Serial.println(A.convertToVoltage(A.readSingleContinuous()), 6);
-          //The conversion is printed in Volts with 6 decimal digits
-          //Note: Certain serial terminals cannot keep up with high speed datastream!
-        }
-        A.stopConversion();
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'C':                       //Cycle single ended inputs (A0+GND, A1+GND ... A7+GND)
+  // if (1) {
+  //   //char commandCharacter = Serial.read();  //we use characters (letters) for controlling the switch-case
+  //   char commandCharacter='C';
+  //   switch (commandCharacter)  //based on the command character, we decide what to do
+  //   {
+  //     case 's':  //SDATAC - Stop Reading Data Continously
+  //       A.stopConversion();
+  //       break;
+  //     //--------------------------------------------------------------------------------------------------------
+  //     case 'L':  //Perform a self calibration
+  //       A.sendDirectCommand(SELFCAL);
+  //       break;
+  //     //--------------------------------------------------------------------------------------------------------
+  //     case 'G':                       //Read a single input continuously
+  //       while (Serial.read() != 's')  //The conversion is stopped by a character received from the serial port
+  //       {
+  //         Serial.println(A.convertToVoltage(A.readSingleContinuous()), 6);
+  //         //The conversion is printed in Volts with 6 decimal digits
+  //         //Note: Certain serial terminals cannot keep up with high speed datastream!
+  //       }
+  //       A.stopConversion();
+  //       break;
+  //     //--------------------------------------------------------------------------------------------------------
+  //     case 'C':                       //Cycle single ended inputs (A0+GND, A1+GND ... A7+GND)
        // while (Serial.read() != 's')  //The conversion is stopped by a character received from the serial port
        // {
           float channels[8];  //Buffer that holds 8 conversions (8 single-ended channels)
           for (int j = 0; j < 8; j++) {
-            channels[j] = A.convertToVoltage(A.cycleSingle());  //store the converted single-ended results in the buffer
-      //    }
+            channels[j] = A.cycleSingle()/10000000.0;//A.convertToVoltage(A.cycleSingle());  //store the converted single-ended results in the buffer
+          }
           for (int i = 0; i < 8; i++) {
             Serial.print(channels[i], 4);  //print the converted single-ended results with 4 digits
 
@@ -242,150 +242,151 @@ void loop() {
             }
           }
           Serial.println();  //Printing a linebreak - this will put the next 8 conversions in a new line
-        }
-        A.stopConversion();
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'D':                       //Cycle differential inputs (A0+A1, A2+A3, A4+A5, A6+A7)
-        while (1)  //The conversion is stopped by a character received from the serial port
-        {
-          float channels[8];  //Buffer that holds 4 conversions (4 differential channels)
-          for (int j = 0; j < 8; j++) {
-            channels[j] = A.convertToVoltage(A.cycleSingle());  //store the converted differential results in the buffer
-          }
+      //  }
+      A.stopConversion();
+      delay(100);
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'D':                       //Cycle differential inputs (A0+A1, A2+A3, A4+A5, A6+A7)
+    //     while (1)  //The conversion is stopped by a character received from the serial port
+    //     {
+    //       float channels[8];  //Buffer that holds 4 conversions (4 differential channels)
+    //       for (int j = 0; j < 8; j++) {
+    //         channels[j] = A.convertToVoltage(A.cycleSingle());  //store the converted differential results in the buffer
+    //       }
 
-          //After the 4 conversions are in the buffer, the contents are printed on the serial terminal
-          for (int i = 0; i < 8; i++) {
-            Serial.print(channels[i], 4);  //print the converted differential results from the buffer
+    //       //After the 4 conversions are in the buffer, the contents are printed on the serial terminal
+    //       for (int i = 0; i < 8; i++) {
+    //         Serial.print(channels[i], 4);  //print the converted differential results from the buffer
 
-            if (i < 7)  //Only printing tab between the first 3 conversions
-            {
-              Serial.print(",");  //tab separator to separate the 4 conversions shown in the same line
-            }
-          }
-          Serial.println();  //Printing a linebreak - this will put the next 4 conversions in a new line
-          delay(100);
-        }
-        A.stopConversion();
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'B':  //Speed test
-        {
-          //Variables to store and measure elapsed time and define the number of conversions
-          long numberOfSamples = 30000;  //Number of conversions
-          long finishTime = 0;
-          long startTime = micros();
+    //         if (i < 7)  //Only printing tab between the first 3 conversions
+    //         {
+    //           Serial.print(",");  //tab separator to separate the 4 conversions shown in the same line
+    //         }
+    //       }
+    //       Serial.println();  //Printing a linebreak - this will put the next 4 conversions in a new line
+    //       delay(100);
+    //     }
+    //     A.stopConversion();
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'B':  //Speed test
+    //     {
+    //       //Variables to store and measure elapsed time and define the number of conversions
+    //       long numberOfSamples = 30000;  //Number of conversions
+    //       long finishTime = 0;
+    //       long startTime = micros();
 
-          for (long i = 0; i < numberOfSamples; i++) {
-            A.readSingleContinuous();
-            //Note: here we just perform the readings and we don't print the results
-          }
+    //       for (long i = 0; i < numberOfSamples; i++) {
+    //         A.readSingleContinuous();
+    //         //Note: here we just perform the readings and we don't print the results
+    //       }
 
-          finishTime = micros() - startTime;  //Calculate the elapsed time
+    //       finishTime = micros() - startTime;  //Calculate the elapsed time
 
-          A.stopConversion();
+    //       A.stopConversion();
 
-          //Printing the results
-          Serial.print("Total conversion time for 150k samples: ");
-          Serial.print(finishTime);
-          Serial.println(" us");
+    //       //Printing the results
+    //       Serial.print("Total conversion time for 150k samples: ");
+    //       Serial.print(finishTime);
+    //       Serial.println(" us");
 
-          Serial.print("Sampling rate: ");
-          Serial.print(numberOfSamples * (1000000.0 / finishTime), 3);
-          Serial.println(" SPS");
-        }
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'T':  //Testing the serial connection
-        Serial.println("The serial connection is OK!");
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'a':  //Testing a single conversion - Only one single result is returned
+    //       Serial.print("Sampling rate: ");
+    //       Serial.print(numberOfSamples * (1000000.0 / finishTime), 3);
+    //       Serial.println(" SPS");
+    //     }
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'T':  //Testing the serial connection
+    //     Serial.println("The serial connection is OK!");
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'a':  //Testing a single conversion - Only one single result is returned
 
-        rawConversion = A.readSingle();                    //Reading the raw value from a previously selected input, passing it to a variable
-        voltageValue = A.convertToVoltage(rawConversion);  //Converting the above conversion into a floating point number
+    //     rawConversion = A.readSingle();                    //Reading the raw value from a previously selected input, passing it to a variable
+    //     voltageValue = A.convertToVoltage(rawConversion);  //Converting the above conversion into a floating point number
 
-        //Printing the results
-        Serial.print("Single-ended conversion result: ");
-        Serial.println(voltageValue, 8);  //Print the floating point number with 8 digits.
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'M':  //set MUX
-        {
-          while (!Serial.available());
-          inputMode = Serial.read();  //Read the input mode
+    //     //Printing the results
+    //     Serial.print("Single-ended conversion result: ");
+    //     Serial.println(voltageValue, 8);  //Print the floating point number with 8 digits.
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'M':  //set MUX
+    //     {
+    //       while (!Serial.available());
+    //       inputMode = Serial.read();  //Read the input mode
 
-          if (inputMode == 's')  //single-ended
-          {
-            while (!Serial.available());
-            inputChannel = Serial.parseInt();
-            A.setMUX(singleEndedChannels[inputChannel]);
-            //Example: "Ms1" selects the SING_1 as input channel
-          }
+    //       if (inputMode == 's')  //single-ended
+    //       {
+    //         while (!Serial.available());
+    //         inputChannel = Serial.parseInt();
+    //         A.setMUX(singleEndedChannels[inputChannel]);
+    //         //Example: "Ms1" selects the SING_1 as input channel
+    //       }
 
-          if (inputMode == 'd')  //differential
-          {
-            while (!Serial.available());
-            inputChannel = Serial.parseInt();
-            A.setMUX(differentialChannels[inputChannel]);
-            //Example: "Md0" selects the DIFF_0_1 as input channel
-          }
-        }
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'P':  //Set PGA
-        {
-          while (!Serial.available());
-          pgaSelection = Serial.parseInt();
-          A.setPGA(pgaValues[pgaSelection]);
-          //Example: P4 will select the PGA = 16
-          Serial.print("PGA value: ");
-          Serial.println(A.getPGA());  //Read the PGA from the register and print it
-        }
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'F':  //Set sampling frequency
-        {
-          while (!Serial.available());
-          drateSelection = Serial.parseInt();  //Parse the number (item number in the array)
-          delay(100);
-          Serial.print("DRATE is selected as: ");
-          Serial.println(drateValues[drateSelection]);  //Print the value from the array
-          delay(100);
-          A.setDRATE(drateValues[drateSelection]);  //Pass the value to the register on the ADS1256
-          delay(100);
-          Serial.print("DRATE is set to ");
-          Serial.println(A.readRegister(DRATE_REG));  //Read the register to see if the value was updated correctly
-          //Example: F3 will make the DRATE = 3750 SPS
-        }
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'R':  //read register
-        {
-          while (!Serial.available());
-          registerToRead = Serial.parseInt();  //This part reads the number of the register from the serial port
-          Serial.print("Value of ");
-          Serial.print(registers[registerToRead]);
-          Serial.print(" register is: ");
-          Serial.println(A.readRegister(registerToRead));
-          //Example: "R2" will read the register at address 2 which is the ADCON register
-          //Note: The value is printed as a decimal number
-        }
-        break;
-      //--------------------------------------------------------------------------------------------------------
-      case 'W':  //Write register
-        {
-          while (!Serial.available());
-          registerToWrite = Serial.parseInt();  //This part reads the number of the register from the serial port
-          while (!Serial.available());
-          registerValueToWrite = Serial.parseInt();  //This part reads the value of the register from the serial port
+    //       if (inputMode == 'd')  //differential
+    //       {
+    //         while (!Serial.available());
+    //         inputChannel = Serial.parseInt();
+    //         A.setMUX(differentialChannels[inputChannel]);
+    //         //Example: "Md0" selects the DIFF_0_1 as input channel
+    //       }
+    //     }
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'P':  //Set PGA
+    //     {
+    //       while (!Serial.available());
+    //       pgaSelection = Serial.parseInt();
+    //       A.setPGA(pgaValues[pgaSelection]);
+    //       //Example: P4 will select the PGA = 16
+    //       Serial.print("PGA value: ");
+    //       Serial.println(A.getPGA());  //Read the PGA from the register and print it
+    //     }
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'F':  //Set sampling frequency
+    //     {
+    //       while (!Serial.available());
+    //       drateSelection = Serial.parseInt();  //Parse the number (item number in the array)
+    //       delay(100);
+    //       Serial.print("DRATE is selected as: ");
+    //       Serial.println(drateValues[drateSelection]);  //Print the value from the array
+    //       delay(100);
+    //       A.setDRATE(drateValues[drateSelection]);  //Pass the value to the register on the ADS1256
+    //       delay(100);
+    //       Serial.print("DRATE is set to ");
+    //       Serial.println(A.readRegister(DRATE_REG));  //Read the register to see if the value was updated correctly
+    //       //Example: F3 will make the DRATE = 3750 SPS
+    //     }
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'R':  //read register
+    //     {
+    //       while (!Serial.available());
+    //       registerToRead = Serial.parseInt();  //This part reads the number of the register from the serial port
+    //       Serial.print("Value of ");
+    //       Serial.print(registers[registerToRead]);
+    //       Serial.print(" register is: ");
+    //       Serial.println(A.readRegister(registerToRead));
+    //       //Example: "R2" will read the register at address 2 which is the ADCON register
+    //       //Note: The value is printed as a decimal number
+    //     }
+    //     break;
+    //   //--------------------------------------------------------------------------------------------------------
+    //   case 'W':  //Write register
+    //     {
+    //       while (!Serial.available());
+    //       registerToWrite = Serial.parseInt();  //This part reads the number of the register from the serial port
+    //       while (!Serial.available());
+    //       registerValueToWrite = Serial.parseInt();  //This part reads the value of the register from the serial port
 
-          A.writeRegister(registerToWrite, registerValueToWrite);
-          //Example: "W1 35" will write 35 ("00100011") on register 1 which is the MUX register.
-          //This will make the input as DIFF_2_3 (A2(+) & A1(-))
-        }
-        break;
-        //--------------------------------------------------------------------------------------------------------
-    }
+    //       A.writeRegister(registerToWrite, registerValueToWrite);
+    //       //Example: "W1 35" will write 35 ("00100011") on register 1 which is the MUX register.
+    //       //This will make the input as DIFF_2_3 (A2(+) & A1(-))
+    //     }
+    //     break;
+    //     //--------------------------------------------------------------------------------------------------------
+    // }
   }
-}
+
