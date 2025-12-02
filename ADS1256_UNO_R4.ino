@@ -1,7 +1,7 @@
 //This code belongs to the ADS1256 library developed by Curious Scientist
 //A very detailed documentation can be found at: https://curiousscientist.tech/ads1256-custom-library
 
-#include <ADS1256.h>
+#include "ADS1256.h"
 
 //#define ADS1256_SPI_ALREADY_STARTED  //prevent internal _spi->begin() to allow custom SPI initialization
 
@@ -227,18 +227,18 @@ void loop() {
         break;
       //--------------------------------------------------------------------------------------------------------
       case 'C':                       //Cycle single ended inputs (A0+GND, A1+GND ... A7+GND)
-        while (Serial.read() != 's')  //The conversion is stopped by a character received from the serial port
-        {
+       // while (Serial.read() != 's')  //The conversion is stopped by a character received from the serial port
+       // {
           float channels[8];  //Buffer that holds 8 conversions (8 single-ended channels)
           for (int j = 0; j < 8; j++) {
             channels[j] = A.convertToVoltage(A.cycleSingle());  //store the converted single-ended results in the buffer
-          }
+      //    }
           for (int i = 0; i < 8; i++) {
             Serial.print(channels[i], 4);  //print the converted single-ended results with 4 digits
 
             if (i < 7)  //Only printing tab between the first 7 conversions
             {
-              Serial.print("\t");  //tab separator to separate the 8 conversions shown in the same line
+              Serial.print(",");  //tab separator to separate the 8 conversions shown in the same line
             }
           }
           Serial.println();  //Printing a linebreak - this will put the next 8 conversions in a new line
